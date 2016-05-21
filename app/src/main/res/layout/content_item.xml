@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="50dp"
+    android:paddingLeft="0dp"
+    android:background="#e8f0f2"
+    android:paddingRight="0dp"
+    android:paddingBottom="0dp"
+    android:padding="0dp"
+    tools:showIn="@layout/activity_item_detail">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="15dp"
+        android:paddingTop="15dp"
+        android:paddingRight="15dp"
+        android:paddingBottom="20dp"
+        android:layout_marginBottom="16px"
+        android:background="#ffffff"
+        android:layout_marginTop="55dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="这是标签"
+                android:id="@+id/label_item"
+                android:background="#eef6f8"
+                android:textColor="#1e8bea"
+                android:padding="6dp"
+                android:layout_marginRight="10dp"
+                android:textSize="12dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="这是标签"
+                android:id="@+id/textView"
+                android:background="#eef6f8"
+                android:textColor="#1e8bea"
+                android:padding="6dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_alignParentTop="true"
+                android:layout_toEndOf="@+id/label_item"
+                android:textSize="12dp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="哪一刻让你终于意识到了和对方阶级不同？"
+                android:id="@+id/item_title"
+                android:textSize="18dp"
+                android:layout_marginBottom="0dp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="我的经历，大学同学圈里，这个西藏云南，这个日本，这个美国，那个欧洲一月游，而有的只能回乡下待在家里做各种家务。就那么一个瞬间，阶级差距一下子就拉出来了。 那个时候才发现原来大家不是在同一水平线上的。"
+                android:id="@+id/textView2"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true"
+                android:textSize="12dp" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#ffffff">
+
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/reply_listview"
+            android:divider="#e1e1e1"
+            android:dividerHeight="1px" />
+    </LinearLayout>
+
+</LinearLayout>

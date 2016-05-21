@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="32px"
+    android:paddingLeft="32px"
+    android:padding="32px"
+    android:paddingBottom="32px"
+    android:paddingRight="32px">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="20px">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:id="@+id/reply_item_avatar"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:background="@color/accent_material_dark"
+            android:layout_marginRight="18px" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Biousco"
+            android:id="@+id/reply_item_user"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:textSize="12dp" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="我认识我现在老婆之前，最后一任女朋友。 刚认识的时候，也表现出优雅有品味的样子。然而一次和朋友们吃饭，她让服务员提供花生酱，服务员表示店里没有，她不依不饶，为难服务员，甚至表示要投诉，并且要求服务员去外面给她买。"
+        android:id="@+id/reply_item_content"
+        android:textSize="13dp"
+        android:textColor="#393939" />
+
+</LinearLayout>
