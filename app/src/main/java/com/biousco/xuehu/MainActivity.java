@@ -11,10 +11,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
+import org.xutils.common.Callback;
+import org.xutils.http.RequestParams;
 import org.xutils.view.annotation.ContentView;
 import org.xutils.view.annotation.Event;
 import org.xutils.view.annotation.ViewInject;
+import org.xutils.x;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,6 +56,30 @@ public class MainActivity extends BaseActivity {
     private List<Map<String, Object>> getData() {
         ArrayList<Map<String, Object>> listitem = new ArrayList<Map<String, Object>>();
         Map<String, Object> map = new HashMap<String, Object>();
+
+        RequestParams params = new RequestParams("http://192.168.191.1:3000/xuehu");
+        x.http().get(params, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                Toast.makeText(x.app(), result, Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                Toast.makeText(x.app(), ex.getMessage(), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onCancelled(Callback.CancelledException cex) {
+                Toast.makeText(x.app(), "cancelled", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFinished() {
+
+            }
+        });
+
         map.put("avatar", R.drawable.ava);
         map.put("name", "张小丽");
         map.put("title", "随便的一个标题");

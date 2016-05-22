@@ -63,6 +63,13 @@
 
             </android.support.design.widget.TextInputLayout>
 
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="记住用户名和密码"
+                android:id="@+id/remember_checkbox"
+                android:checked="false" />
+
             <Button
                 android:id="@+id/email_sign_in_button"
                 style="?android:textAppearanceSmall"
