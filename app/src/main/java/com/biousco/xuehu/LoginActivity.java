@@ -1,8 +1,12 @@
 package com.biousco.xuehu;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Message;
 import android.os.AsyncTask;
@@ -30,7 +34,14 @@ import android.content.DialogInterface;
 import android.widget.Toast;
 
 import com.biousco.xuehu.Cgi.XuehuApi;
+import com.biousco.xuehu.Model.EssayArticle;
+import com.biousco.xuehu.Model.LoginModel;
+import com.biousco.xuehu.Model.UserInfoModel;
+import com.biousco.xuehu.helper.PreferenceUtil;
+import com.biousco.xuehu.helper.UserInfoHelper;
+import com.google.gson.Gson;
 
+import org.json.JSONObject;
 import org.xutils.common.Callback;
 import org.xutils.http.RequestParams;
 import org.xutils.view.annotation.ContentView;
@@ -166,22 +177,21 @@ public class LoginActivity extends BaseActivity {
             // form field with an error.
             focusView.requestFocus();
         } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+            userLogin(email, password);
+//            mAuthTask = new UserLoginTask(email, password);
+//            mAuthTask.execute((Void) null);
         }
     }
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
-        return email.contains("@");
+        return true;
     }
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
-        return password.length() > 4;
+        return password.length() >= 4;
     }
 
     /**
@@ -189,7 +199,81 @@ public class LoginActivity extends BaseActivity {
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
-        progressDialog = ProgressDialog.show(LoginActivity.this, "登陆", "正在登陆");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+        }
+
+
+        //progressDialog = ProgressDialog.show(LoginActivity.this, "登陆", "正在登陆");
+    }
+
+    /** 请求后台进行登录 **/
+    private void userLogin(String email, String password) {
+
+        RequestParams requestParams = new RequestParams(XuehuApi.LOGIN_URL);
+        requestParams.addBodyParameter("userid", email);
+        requestParams.addBodyParameter("password", password);
+
+        final Context _this = this;
+        //指定回调函数的返回类型为JSON
+        x.http().post(requestParams, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                Gson gson = new Gson();
+                LoginModel data = gson.fromJson(result, LoginModel.class);
+                if(data.code == 0) {
+                    //登录成功
+                    UserInfoModel ui = data.data;
+                    if(PreferenceUtil.saveUserInfo(_this, ui)) {
+                        Toast.makeText(x.app(), "登录成功", Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        LoginActivity.this.startActivity(intent);
+                    }
+                } else {
+                    Toast.makeText(x.app(), data.msg, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                Toast.makeText(x.app(), ex.getMessage(), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+                Toast.makeText(x.app(), "cancelled", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFinished() {
+
+            }
+
+        });
     }
 
 
@@ -207,46 +291,23 @@ public class LoginActivity extends BaseActivity {
             mPassword = password;
         }
 
+        //这里params对应实例化时传入的email和password
+        //* 这里的Void参数对应AsyncTask中的第一个参数
+        //* 这里的Boolean返回值对应AsyncTask的第三个参数
+        //* 该方法并不运行在UI线程当中，主要用于异步操作，所有在该方法中不能对UI当中的空间进行设置和修改
+        //* 但是可以调用publishProgress方法触发onProgressUpdate对UI进行操作
         @Override
         protected Boolean doInBackground(Void... params) {
 
-            RequestParams requestParams = new RequestParams(XuehuApi.LOGIN_URL);
-            requestParams.addBodyParameter("userid", mEmail);
-            requestParams.addBodyParameter("password", mPassword);
-            x.http().get(requestParams, new Callback.CommonCallback<String>() {
-                @Override
-                public void onSuccess(String result) {
 
-                }
-
-                @Override
-                public void onError(Throwable ex, boolean isOnCallback) {
-                    Toast.makeText(x.app(), ex.getMessage(), Toast.LENGTH_LONG).show();
-                }
-
-                @Override
-                public void onCancelled(CancelledException cex) {
-                    Toast.makeText(x.app(), "cancelled", Toast.LENGTH_LONG).show();
-                }
-
-                @Override
-                public void onFinished() {
-
-                }
-
-            });
 
             return true;
 
 
         }
 
-        protected boolean requestLogin() {
 
-            return true;
-
-        }
-
+        //该方法运行在UI线程当中,并且运行在UI线程当中 可以对UI空间进行设置
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;

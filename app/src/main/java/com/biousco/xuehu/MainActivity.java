@@ -17,6 +17,8 @@ import android.widget.Toast;
 import com.biousco.xuehu.Cgi.XuehuApi;
 import com.biousco.xuehu.Model.ArticleItem;
 import com.biousco.xuehu.Model.EssayArticle;
+import com.biousco.xuehu.helper.PreferenceUtil;
+import com.biousco.xuehu.helper.UserInfoHelper;
 import com.google.gson.Gson;
 
 import org.xutils.common.Callback;
@@ -51,21 +53,19 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //检查是否登录
-        if(!checkIfLogin()) {
-            Bundle bundle = new Bundle();
-            bundle.putString("result", "-1");
+        if(!PreferenceUtil.checkIfLogin(this)) {
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-            intent.putExtras(bundle);
             MainActivity.this.startActivity(intent);
+            MainActivity.this.finish();
         };
         //服务器领取数据
         getInitData();
         setSupportActionBar(toolbar);
     }
 
-    private boolean checkIfLogin() {
-        sharedPreferences = getSharedPreferences(SAVE_FILE_NAME, 0);
-        String username = sharedPreferences.getString("token", "").toString();
+    public boolean checkIfLogin() {
+        this.sharedPreferences = getSharedPreferences(SAVE_FILE_NAME, MODE_PRIVATE);
+        String username = this.sharedPreferences.getString("token", "").toString();
         if(sharedPreferences == null || username.equals("")) {
             return false;
         } else {
