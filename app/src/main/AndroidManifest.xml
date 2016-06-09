@@ -33,7 +33,16 @@
         <activity
             android:name=".ItemDetailActivity"
             android:label="@string/title_activity_ItemDetail"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".CenterActivity"
+            android:label="@string/title_activity_center"
+            android:parentActivityName=".BaseActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.biousco.xuehu.BaseActivity" />
+        </activity>
     </application>
 
 </manifest>
