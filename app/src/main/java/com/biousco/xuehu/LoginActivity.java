@@ -60,10 +60,6 @@ public class LoginActivity extends BaseActivity {
     public static final String USERID = "UserID";
     public static final String PASSWORD = "PassWord";
 
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-    private UserLoginTask mAuthTask = null;
     private ProgressDialog progressDialog;
 
     // UI references.
@@ -139,10 +135,6 @@ public class LoginActivity extends BaseActivity {
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
-
         // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
@@ -252,6 +244,7 @@ public class LoginActivity extends BaseActivity {
                         Toast.makeText(x.app(), "登录成功", Toast.LENGTH_LONG).show();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         LoginActivity.this.startActivity(intent);
+                        LoginActivity.this.finish();
                     }
                 } else {
                     Toast.makeText(x.app(), data.msg, Toast.LENGTH_LONG).show();
@@ -276,56 +269,5 @@ public class LoginActivity extends BaseActivity {
         });
     }
 
-
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-        private final String mEmail;
-        private final String mPassword;
-
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
-        }
-
-        //这里params对应实例化时传入的email和password
-        //* 这里的Void参数对应AsyncTask中的第一个参数
-        //* 这里的Boolean返回值对应AsyncTask的第三个参数
-        //* 该方法并不运行在UI线程当中，主要用于异步操作，所有在该方法中不能对UI当中的空间进行设置和修改
-        //* 但是可以调用publishProgress方法触发onProgressUpdate对UI进行操作
-        @Override
-        protected Boolean doInBackground(Void... params) {
-
-
-
-            return true;
-
-
-        }
-
-
-        //该方法运行在UI线程当中,并且运行在UI线程当中 可以对UI空间进行设置
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
-        }
-    }
 }
 

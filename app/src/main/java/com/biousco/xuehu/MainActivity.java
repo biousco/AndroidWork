@@ -63,16 +63,6 @@ public class MainActivity extends BaseActivity {
         setSupportActionBar(toolbar);
     }
 
-    public boolean checkIfLogin() {
-        this.sharedPreferences = getSharedPreferences(SAVE_FILE_NAME, MODE_PRIVATE);
-        String username = this.sharedPreferences.getString("token", "").toString();
-        if(sharedPreferences == null || username.equals("")) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
     private void getInitData() {
         RequestParams params = new RequestParams(XuehuApi.GETARTICLE_URL);
         x.http().get(params, new Callback.CommonCallback<String>() {
@@ -112,6 +102,7 @@ public class MainActivity extends BaseActivity {
                 finalMap.put("name", "张晓丽");
                 finalMap.put("title", list.title);
                 finalMap.put("content", list.content);
+                finalMap.put("id", list.id);
                 listitem.add(finalMap);
             }
         }
@@ -121,14 +112,16 @@ public class MainActivity extends BaseActivity {
                 this,
                 listitem,
                 R.layout.list_item,
-                new String[]{"avatar", "name", "title", "content"},
+                new String[]{"avatar", "name", "title", "content", "id"},
                 new int[]{R.id.item_user_avatar,
                         R.id.item_user, R.id.item_title, R.id.item_content_brief});
         listView.setAdapter(listItemAdapter);
     }
 
+    //帖子列表点击跳转
     @Event(value = R.id.listView, type = AdapterView.OnItemClickListener.class)
     private void onListClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+        Map<String, Object> clkmap = (Map<String, Object>)arg0.getItemAtPosition(arg2);
         Intent intent = new Intent();
         intent.setClass(MainActivity.this, ItemDetailActivity.class);
         MainActivity.this.startActivity(intent);
