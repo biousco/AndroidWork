@@ -9,6 +9,8 @@ public class XuehuApi {
     public static String GETARTICLE_URL = apiDomain + "/GDUFS/XHBBS/Essay/getArticle";
     public static String GETARTICLE_DETAIL_URL = apiDomain + "/GDUFS/XHBBS/Essay/getDetails";
     public static String POST_COMMENT_URL = apiDomain + "/GDUFS/XHBBS/Essay/comment";
+    public static String POST_ARTICLE_URL = apiDomain + "/GDUFS/XHBBS/Essay/publish";
+
 
 
 }

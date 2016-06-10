@@ -69,7 +69,8 @@
             android:layout_below="@+id/item_title"
             android:layout_marginTop="5dp"
             android:layout_alignParentEnd="true"
-            android:textSize="36px" />
+            android:textSize="36px"
+            android:maxLines="3" />
     </LinearLayout>
 
 </RelativeLayout>

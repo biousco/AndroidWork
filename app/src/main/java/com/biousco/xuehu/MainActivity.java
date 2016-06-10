@@ -2,14 +2,19 @@ package com.biousco.xuehu;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
@@ -28,13 +33,17 @@ import org.xutils.view.annotation.Event;
 import org.xutils.view.annotation.ViewInject;
 import org.xutils.x;
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.RunnableFuture;
 
 @ContentView(R.layout.activity_main)
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity{
 
     @ViewInject(R.id.toolbar)
     private Toolbar toolbar;
@@ -45,6 +54,9 @@ public class MainActivity extends BaseActivity {
     @ViewInject(value = R.id.listView, parentId = R.layout.in_content_item)
     private ListView listView;
 
+    @ViewInject(value = R.id.swipe, parentId = R.layout.in_content_item)
+    private SwipeRefreshLayout swipeLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,12 +66,18 @@ public class MainActivity extends BaseActivity {
             MainActivity.this.startActivity(intent);
             MainActivity.this.finish();
         };
+        setSupportActionBar(toolbar);
+        swipeLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
         //服务器领取数据
         getInitData();
-        setSupportActionBar(toolbar);
     }
 
     private void getInitData() {
+
         RequestParams params = new RequestParams(XuehuApi.GETARTICLE_URL);
         x.http().get(params, new Callback.CommonCallback<String>() {
             @Override
@@ -74,7 +92,7 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onCancelled(Callback.CancelledException cex) {
-                Toast.makeText(x.app(), "cancelled", Toast.LENGTH_LONG).show();
+                Toast.makeText(x.app(), "cancelled", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -87,19 +105,20 @@ public class MainActivity extends BaseActivity {
     //拿到数据的回调
     private void dataSuccessCallback(String result) {
         final ArrayList<Map<String, Object>> listitem = new ArrayList<>();
-        Map<String, Object> map = new HashMap<>();
-        final Map<String, Object> finalMap = map;
         Gson gson = new Gson();
         EssayArticle data = gson.fromJson(result, EssayArticle.class);
+
         if(data.code == 0) {
             ArrayList<ArticleItem> arr = data.data;
+
             for(ArticleItem list:arr) {
-                finalMap.put("avatar", R.drawable.ava);
-                finalMap.put("name", "张晓丽");
-                finalMap.put("title", list.title);
-                finalMap.put("content", list.content);
-                finalMap.put("id", list.id);
-                listitem.add(finalMap);
+                Map<String, Object> map = new HashMap<>();
+                map.put("avatar", getHttpBitmap(list.imageurl));
+                map.put("name", list.username);
+                map.put("title", list.title);
+                map.put("content", list.content);
+                map.put("id", list.id);
+                listitem.add(map);
             }
         }
 
@@ -112,6 +131,9 @@ public class MainActivity extends BaseActivity {
                 new int[]{R.id.item_user_avatar,
                         R.id.item_user, R.id.item_title, R.id.item_content_brief});
         listView.setAdapter(listItemAdapter);
+        swipeLayout.setEnabled(true);
+        swipeLayout.setRefreshing(false);
+        Toast.makeText(x.app(), "刷新成功", Toast.LENGTH_SHORT).show();
     }
 
     //帖子列表点击跳转
@@ -125,13 +147,54 @@ public class MainActivity extends BaseActivity {
         //MainActivity.this.finish();
     }
 
-
+    //发表帖子
     @Event(value = R.id.fab)
-    private void onLoginClick(View view) {
+    private void onPostClick(View view) {
         Intent intent = new Intent();
-        intent.setClass(MainActivity.this, LoginActivity.class);
+        intent.setClass(MainActivity.this, PostArticleActivity.class);
         MainActivity.this.startActivity(intent);
         //MainActivity.this.finish();
+    }
+
+    //下拉刷新
+    @Event(value = R.id.swipe, type = SwipeRefreshLayout.OnRefreshListener.class)
+    private void onRefresh() {
+        swipeLayout.setEnabled(false);
+        getInitData();
+    }
+
+    private ImageView setupImage(ImageView imageView, String imgUrl) {
+        x.image().bind(imageView, imgUrl);
+        return imageView;
+    }
+
+    public static Bitmap getHttpBitmap(String url){
+        URL myFileURL;
+        Bitmap bitmap=null;
+        try{
+            myFileURL = new URL(url);
+            //获得连接
+            HttpURLConnection conn=(HttpURLConnection)myFileURL.openConnection();
+            //设置超时时间为6000毫秒，conn.setConnectionTiem(0);表示没有时间限制
+            conn.setConnectTimeout(6000);
+            //连接设置获得数据流
+            conn.setDoInput(true);
+            //不使用缓存
+            conn.setUseCaches(false);
+            //这句可有可无，没有影响
+            //conn.connect();
+            //得到数据流
+            InputStream is = conn.getInputStream();
+            //解析得到图片
+            bitmap = BitmapFactory.decodeStream(is);
+            //关闭数据流
+            is.close();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return bitmap;
+
     }
 
 }

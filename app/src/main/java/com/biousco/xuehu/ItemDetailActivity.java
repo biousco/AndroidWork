@@ -105,7 +105,7 @@ public class ItemDetailActivity extends BaseActivity {
             for(CommentModel list:comments) {
                 Map<String, Object> map = new HashMap<String, Object>();
                 map.put("avatar", R.drawable.ava);
-                map.put("name", "张晓丽");
+                map.put("name", list.username);
                 map.put("content", list.content);
                 map.put("id", list.id);
                 listitem.add(map);

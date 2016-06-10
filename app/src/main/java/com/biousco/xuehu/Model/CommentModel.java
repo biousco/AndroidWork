@@ -9,4 +9,6 @@ public class CommentModel {
     public String userid;
     public String content;
     public String runtime;
+    public String username;
+    public String imageurl;
 }

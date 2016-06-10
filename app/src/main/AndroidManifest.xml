@@ -37,7 +37,8 @@
         <activity
             android:name=".PostComment"
             android:label="添加回复"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".PostArticleActivity"></activity>
     </application>
 
 </manifest>
