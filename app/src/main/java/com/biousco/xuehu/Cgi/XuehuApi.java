@@ -7,5 +7,8 @@ public class XuehuApi {
     private static String apiDomain = "http://115.28.188.150";
     public static String LOGIN_URL = apiDomain + "/GDUFS/auth/Login/checklogin";
     public static String GETARTICLE_URL = apiDomain + "/GDUFS/XHBBS/Essay/getArticle";
+    public static String GETARTICLE_DETAIL_URL = apiDomain + "/GDUFS/XHBBS/Essay/getDetails";
+    public static String POST_COMMENT_URL = apiDomain + "/GDUFS/XHBBS/Essay/comment";
+
 
 }

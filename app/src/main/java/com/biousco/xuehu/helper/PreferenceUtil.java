@@ -6,6 +6,9 @@ import android.preference.PreferenceManager;
 
 import com.biousco.xuehu.Model.UserInfoModel;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Biousco on 6/9.
  */
@@ -36,6 +39,21 @@ public class PreferenceUtil {
         setParam(context, "token", ui.token);
         setParam(context, "runtime", ui.runtime);
         return true;
+    }
+
+    //获取用户信息
+    public static Map<String, String> getUserInfo(Context context) {
+        Map<String, String> map = new HashMap<>();
+        try {
+            map.put("token", getParam(context, "token", "").toString());
+            map.put("userid", getParam(context, "userid", "").toString());
+            map.put("username", getParam(context, "username", "").toString());
+            map.put("imageurl", getParam(context, "imageurl", "").toString());
+            map.put("runtime", getParam(context, "runtime", "").toString());
+        } catch (Exception ex) {
+
+        }
+        return map;
     }
 
     /**

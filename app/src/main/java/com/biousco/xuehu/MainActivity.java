@@ -36,17 +36,13 @@ import java.util.Map;
 @ContentView(R.layout.activity_main)
 public class MainActivity extends BaseActivity {
 
-    private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor spEditor;
-    private static final String SAVE_FILE_NAME = "userInfo";
-
     @ViewInject(R.id.toolbar)
     private Toolbar toolbar;
 
     @ViewInject(R.id.fab)
     private FloatingActionButton fab;
 
-    @ViewInject(R.id.listView)
+    @ViewInject(value = R.id.listView, parentId = R.layout.in_content_item)
     private ListView listView;
 
     @Override
@@ -120,10 +116,11 @@ public class MainActivity extends BaseActivity {
 
     //帖子列表点击跳转
     @Event(value = R.id.listView, type = AdapterView.OnItemClickListener.class)
-    private void onListClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-        Map<String, Object> clkmap = (Map<String, Object>)arg0.getItemAtPosition(arg2);
+    private void onListClick(AdapterView<?> parent, View view, int position, long id) {
+        Map<String, Object> clkmap = (Map<String, Object>)parent.getItemAtPosition(position);
         Intent intent = new Intent();
         intent.setClass(MainActivity.this, ItemDetailActivity.class);
+        intent.putExtra("id", clkmap.get("id").toString());
         MainActivity.this.startActivity(intent);
         //MainActivity.this.finish();
     }

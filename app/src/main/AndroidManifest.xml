@@ -33,6 +33,10 @@
         <activity
             android:name=".ItemDetailActivity"
             android:label="@string/title_activity_ItemDetail"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".PostComment"
+            android:label="添加回复"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
