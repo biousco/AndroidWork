@@ -17,6 +17,8 @@ import android.widget.Toast;
 import com.biousco.xuehu.Cgi.XuehuApi;
 import com.biousco.xuehu.Model.ArticleItem;
 import com.biousco.xuehu.Model.EssayArticle;
+import com.biousco.xuehu.helper.PreferenceUtil;
+import com.biousco.xuehu.helper.UserInfoHelper;
 import com.google.gson.Gson;
 
 import org.xutils.common.Callback;
@@ -51,26 +53,14 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //检查是否登录
-        if(!checkIfLogin()) {
-            Bundle bundle = new Bundle();
-            bundle.putString("result", "-1");
+        if(!PreferenceUtil.checkIfLogin(this)) {
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-            intent.putExtras(bundle);
             MainActivity.this.startActivity(intent);
+            MainActivity.this.finish();
         };
         //服务器领取数据
         getInitData();
         setSupportActionBar(toolbar);
-    }
-
-    private boolean checkIfLogin() {
-        sharedPreferences = getSharedPreferences(SAVE_FILE_NAME, 0);
-        String username = sharedPreferences.getString("token", "").toString();
-        if(sharedPreferences == null || username.equals("")) {
-            return false;
-        } else {
-            return true;
-        }
     }
 
     private void getInitData() {
@@ -112,6 +102,7 @@ public class MainActivity extends BaseActivity {
                 finalMap.put("name", "张晓丽");
                 finalMap.put("title", list.title);
                 finalMap.put("content", list.content);
+                finalMap.put("id", list.id);
                 listitem.add(finalMap);
             }
         }
@@ -121,14 +112,16 @@ public class MainActivity extends BaseActivity {
                 this,
                 listitem,
                 R.layout.list_item,
-                new String[]{"avatar", "name", "title", "content"},
+                new String[]{"avatar", "name", "title", "content", "id"},
                 new int[]{R.id.item_user_avatar,
                         R.id.item_user, R.id.item_title, R.id.item_content_brief});
         listView.setAdapter(listItemAdapter);
     }
 
+    //帖子列表点击跳转
     @Event(value = R.id.listView, type = AdapterView.OnItemClickListener.class)
     private void onListClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+        Map<String, Object> clkmap = (Map<String, Object>)arg0.getItemAtPosition(arg2);
         Intent intent = new Intent();
         intent.setClass(MainActivity.this, ItemDetailActivity.class);
         MainActivity.this.startActivity(intent);

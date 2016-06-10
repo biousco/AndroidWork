@@ -1,8 +1,12 @@
 package com.biousco.xuehu;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Message;
 import android.os.AsyncTask;
@@ -30,7 +34,14 @@ import android.content.DialogInterface;
 import android.widget.Toast;
 
 import com.biousco.xuehu.Cgi.XuehuApi;
+import com.biousco.xuehu.Model.EssayArticle;
+import com.biousco.xuehu.Model.LoginModel;
+import com.biousco.xuehu.Model.UserInfoModel;
+import com.biousco.xuehu.helper.PreferenceUtil;
+import com.biousco.xuehu.helper.UserInfoHelper;
+import com.google.gson.Gson;
 
+import org.json.JSONObject;
 import org.xutils.common.Callback;
 import org.xutils.http.RequestParams;
 import org.xutils.view.annotation.ContentView;
@@ -49,10 +60,6 @@ public class LoginActivity extends BaseActivity {
     public static final String USERID = "UserID";
     public static final String PASSWORD = "PassWord";
 
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-    private UserLoginTask mAuthTask = null;
     private ProgressDialog progressDialog;
 
     // UI references.
@@ -128,10 +135,6 @@ public class LoginActivity extends BaseActivity {
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
-
         // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
@@ -166,22 +169,21 @@ public class LoginActivity extends BaseActivity {
             // form field with an error.
             focusView.requestFocus();
         } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+            userLogin(email, password);
+//            mAuthTask = new UserLoginTask(email, password);
+//            mAuthTask.execute((Void) null);
         }
     }
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
-        return email.contains("@");
+        return true;
     }
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
-        return password.length() > 4;
+        return password.length() >= 4;
     }
 
     /**
@@ -189,82 +191,83 @@ public class LoginActivity extends BaseActivity {
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
-        progressDialog = ProgressDialog.show(LoginActivity.this, "登陆", "正在登陆");
-    }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-        private final String mEmail;
-        private final String mPassword;
-
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-
-            RequestParams requestParams = new RequestParams(XuehuApi.LOGIN_URL);
-            requestParams.addBodyParameter("userid", mEmail);
-            requestParams.addBodyParameter("password", mPassword);
-            x.http().get(requestParams, new Callback.CommonCallback<String>() {
+            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
                 @Override
-                public void onSuccess(String result) {
-
+                public void onAnimationEnd(Animator animation) {
+                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
                 }
-
-                @Override
-                public void onError(Throwable ex, boolean isOnCallback) {
-                    Toast.makeText(x.app(), ex.getMessage(), Toast.LENGTH_LONG).show();
-                }
-
-                @Override
-                public void onCancelled(CancelledException cex) {
-                    Toast.makeText(x.app(), "cancelled", Toast.LENGTH_LONG).show();
-                }
-
-                @Override
-                public void onFinished() {
-
-                }
-
             });
 
-            return true;
-
-
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
 
-        protected boolean requestLogin() {
 
-            return true;
-
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
-        }
+        //progressDialog = ProgressDialog.show(LoginActivity.this, "登陆", "正在登陆");
     }
+
+    /** 请求后台进行登录 **/
+    private void userLogin(String email, String password) {
+
+        RequestParams requestParams = new RequestParams(XuehuApi.LOGIN_URL);
+        requestParams.addBodyParameter("userid", email);
+        requestParams.addBodyParameter("password", password);
+
+        final Context _this = this;
+        //指定回调函数的返回类型为JSON
+        x.http().post(requestParams, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                Gson gson = new Gson();
+                LoginModel data = gson.fromJson(result, LoginModel.class);
+                if(data.code == 0) {
+                    //登录成功
+                    UserInfoModel ui = data.data;
+                    if(PreferenceUtil.saveUserInfo(_this, ui)) {
+                        Toast.makeText(x.app(), "登录成功", Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(LoginActivity.this, CenterActivity.class);
+                        LoginActivity.this.startActivity(intent);
+                        LoginActivity.this.finish();
+                    }
+                } else {
+                    Toast.makeText(x.app(), data.msg, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                Toast.makeText(x.app(), ex.getMessage(), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+                Toast.makeText(x.app(), "cancelled", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFinished() {
+
+            }
+
+        });
+    }
+
 }
 
