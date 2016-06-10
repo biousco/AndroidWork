@@ -1,16 +1,12 @@
 package com.biousco.xuehu.Model;
 
-import java.util.ArrayList;
-
 /**
  * Created by Biousco on 6/9.
  */
-public class ArticleItem {
+public class CommentModel {
     public String id;
-    public String title;
+    public String articleid;
     public String userid;
     public String content;
     public String runtime;
-    public ArrayList<CommentModel> comment_details;
-
 }

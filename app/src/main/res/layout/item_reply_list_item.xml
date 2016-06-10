@@ -24,7 +24,7 @@
             android:layout_marginRight="18px" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="Biousco"
@@ -35,7 +35,7 @@
     </LinearLayout>
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="我认识我现在老婆之前，最后一任女朋友。 刚认识的时候，也表现出优雅有品味的样子。然而一次和朋友们吃饭，她让服务员提供花生酱，服务员表示店里没有，她不依不饶，为难服务员，甚至表示要投诉，并且要求服务员去外面给她买。"
