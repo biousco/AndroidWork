@@ -104,6 +104,7 @@ import org.xutils.view.annotation.ViewInject;
 import org.xutils.x;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import com.biousco.xuehu.helper.DownLoadImage;
 
 @ContentView(R.layout.activity_center)//绑定界面
 public class CenterActivity extends BaseActivity {
@@ -201,9 +202,8 @@ public class CenterActivity extends BaseActivity {
         //图片资源
         String url = ui.get("imageurl");
         //得到可用的图片
-        Bitmap bitmap = ImageUtil.getHttpBitmap(url);
-        image.setImageBitmap(bitmap);
-        image.setImageResource(R.drawable.userface);
+         new DownLoadImage(image).execute(url);
+       // image.setImageResource(R.drawable.userface);
        // Toast.makeText(x.app(),url, Toast.LENGTH_LONG).show();
 
 
