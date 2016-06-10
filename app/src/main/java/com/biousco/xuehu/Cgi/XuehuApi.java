@@ -12,5 +12,8 @@ public class XuehuApi {
     public static String POST_ARTICLE_URL = apiDomain + "/GDUFS/XHBBS/Essay/publish";
 
 
+    public static String POST_UPLOADFACE_URL=apiDomain+"/GDUFS/auth/Modify/upload";
+    public static  String ImgDomain="http://115.28.188.150/GDUFS/Uploads/userface/";
+    public static String POST_MODIFY_URL= apiDomain+"/GDUFS/auth/Modify/modifyInfo";
 
 }
