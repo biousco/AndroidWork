@@ -4,24 +4,29 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_login">Sign in</string>
+    <string name="title_activity_login">登录学乎</string>
 
     <!-- Strings related to login -->
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password (optional)</string>
-    <string name="action_sign_in">Sign in or register</string>
+    <string name="prompt_email">账号</string>
+    <string name="prompt_password">密码</string>
+    <string name="action_sign_in">登录</string>
+    <string name="action_regist">注册</string>
+    <string name="promt_name">昵称</string>
     <string name="action_sign_in_short">登录界面</string>
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_field_required">This field is required</string>
+    <string name="error_invalid_email">账号格式不正确</string>
+    <string name="error_invalid_password">密码长度过小</string>
+    <string name="error_incorrect_password">密码错误</string>
+    <string name="error_field_required">必填项</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
 
     <!--Title-->
-    <string name="title_activity_main2">学乎主界面</string>
+    <string name="title_activity_main2">学乎</string>
     <string name="user_avater">user_avater</string>
     <string name="title_activity_ItemDetail">帖子详情</string>
+    <string name="title_activity_regist">注册学乎</string>
 
     <string name="backendHost">http://localhost:3000</string>
     <string name="title_activity_center">学乎个人中心</string>
+
+
 </resources>

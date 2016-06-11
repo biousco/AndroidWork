@@ -3,21 +3,15 @@ package com.biousco.xuehu;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Message;
-import android.os.AsyncTask;
-
 import android.os.Build;
 import android.os.Bundle;
-
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
-
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -25,23 +19,14 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.app.AlertDialog.Builder;
-import android.content.DialogInterface;
 import android.widget.Toast;
 
 import com.biousco.xuehu.Cgi.XuehuApi;
-import com.biousco.xuehu.Model.EssayArticle;
 import com.biousco.xuehu.Model.LoginModel;
 import com.biousco.xuehu.Model.UserInfoModel;
 import com.biousco.xuehu.helper.PreferenceUtil;
-import com.biousco.xuehu.helper.UserInfoHelper;
 import com.google.gson.Gson;
 
-import org.json.JSONObject;
 import org.xutils.common.Callback;
 import org.xutils.http.RequestParams;
 import org.xutils.view.annotation.ContentView;
@@ -53,8 +38,8 @@ import org.xutils.x;
 /**
  * A login screen that offers login via email/password.
  */
-@ContentView(R.layout.activity_login)
-public class LoginActivity extends BaseActivity {
+@ContentView(R.layout.activity_regist)
+public class RegistActivity extends BaseActivity {
 
     public static final String SP_INFOS = "SPDATA_Files";
     public static final String USERID = "UserID";
@@ -73,19 +58,16 @@ public class LoginActivity extends BaseActivity {
     private View mLoginFormView;
     @ViewInject(R.id.login_progress)
     private View mProgressView;
-    @ViewInject(R.id.remember_checkbox)
-    private CheckBox remember_checkbox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setSpInfos();
     }
 
     @Event(value = R.id.password, type = TextView.OnEditorActionListener.class)
     private boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
         if (id == R.id.login || id == EditorInfo.IME_NULL) {
-            attemptLogin();
+            attemptLoginOrRegist("login");
             return true;
         }
         return false;
@@ -112,35 +94,19 @@ public class LoginActivity extends BaseActivity {
 
     @Event(value = R.id.email_sign_in_button)
     private void onSinginClick(View view) {
-        attemptLogin();
+        attemptLoginOrRegist("login");
     }
 
     @Event(value = R.id.email_regist_button)
-    private void onRegistClick(View view) {
-        Intent intent = new Intent(LoginActivity.this, RegistActivity.class);
-        LoginActivity.this.startActivity(intent);
-    }
+    private void onRegistClick(View view) { attemptLoginOrRegist("regist"); }
 
-    /**
-     * 设置Preferences存储，保存账号和密码
-     **/
-    private void setSpInfos() {
-        SharedPreferences sp = getSharedPreferences(SP_INFOS, MODE_PRIVATE);
-        String uid = sp.getString(USERID, null); // 取Preferences中的帐号
-        String pwd = sp.getString(PASSWORD, null); // 取Preferences中的密码
-        if (uid != null && pwd != null) {
-            this.mEmailView.setText(uid); // 给EditText控件赋帐号
-            this.mPasswordView.setText(pwd); // 给EditText控件赋密码
-            remember_checkbox.setChecked(true);
-        }
-    }
 
     /**
      * Attempts to sign in or register the account specified by the login form.
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private void attemptLogin() {
+    private void attemptLoginOrRegist(String type) {
         // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
@@ -176,7 +142,11 @@ public class LoginActivity extends BaseActivity {
             focusView.requestFocus();
         } else {
             showProgress(true);
-            userLogin(email, password);
+            if(type == "login") {
+                userLogin(email, password);
+            } else if(type == "regist") {
+                userRegist(email, password);
+            }
 
         }
     }
@@ -247,9 +217,9 @@ public class LoginActivity extends BaseActivity {
                     UserInfoModel ui = data.data;
                     if(PreferenceUtil.saveUserInfo(_this, ui)) {
                         Toast.makeText(x.app(), "登录成功", Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(LoginActivity.this, CenterActivity.class);
-                        LoginActivity.this.startActivity(intent);
-                        LoginActivity.this.finish();
+                        Intent intent = new Intent(RegistActivity.this, CenterActivity.class);
+                        RegistActivity.this.startActivity(intent);
+                        RegistActivity.this.finish();
                     }
                 } else {
                     Toast.makeText(x.app(), data.msg, Toast.LENGTH_LONG).show();
@@ -274,6 +244,50 @@ public class LoginActivity extends BaseActivity {
         });
     }
 
+    /** 请求后台进行注册 **/
+    private void userRegist(String email, String password) {
+        RequestParams requestParams = new RequestParams(XuehuApi.POST_REGIST_URL);
+        requestParams.addBodyParameter("userid", email);
+        requestParams.addBodyParameter("password", password);
+
+        final Context _this = this;
+        //指定回调函数的返回类型为JSON
+        x.http().post(requestParams, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                Gson gson = new Gson();
+                LoginModel data = gson.fromJson(result, LoginModel.class);
+                if(data.code == 0) {
+                    //登录成功
+                    UserInfoModel ui = data.data;
+                    if(PreferenceUtil.saveUserInfo(_this, ui)) {
+                        Toast.makeText(x.app(), "登录成功", Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(RegistActivity.this, CenterActivity.class);
+                        RegistActivity.this.startActivity(intent);
+                        RegistActivity.this.finish();
+                    }
+                } else {
+                    Toast.makeText(x.app(), data.msg, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                Toast.makeText(x.app(), ex.getMessage(), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+                Toast.makeText(x.app(), "cancelled", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFinished() {
+
+            }
+
+        });
+    }
 
 }
 

@@ -12,6 +12,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -43,7 +45,7 @@ import java.util.Map;
 import java.util.concurrent.RunnableFuture;
 
 @ContentView(R.layout.activity_main)
-public class MainActivity extends BaseActivity{
+public class MainActivity extends BaseActivity {
 
     @ViewInject(R.id.toolbar)
     private Toolbar toolbar;
@@ -61,12 +63,15 @@ public class MainActivity extends BaseActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //检查是否登录
-        if(!PreferenceUtil.checkIfLogin(this)) {
+        if (!PreferenceUtil.checkIfLogin(this)) {
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             MainActivity.this.startActivity(intent);
             MainActivity.this.finish();
-        };
+        }
+        ;
         setSupportActionBar(toolbar);
+        toolbar.setOnMenuItemClickListener(onMenuItemClick);
+
         swipeLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
@@ -75,6 +80,44 @@ public class MainActivity extends BaseActivity{
         //服务器领取数据
         getInitData();
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    private Toolbar.OnMenuItemClickListener onMenuItemClick = new Toolbar.OnMenuItemClickListener() {
+        @Override
+        public boolean onMenuItemClick(MenuItem menuItem) {
+            String msg = "";
+            switch (menuItem.getItemId()) {
+                //个人中心
+                case R.id.action_center: {
+                    Intent intent = new Intent();
+                    intent.setClass(MainActivity.this, CenterActivity.class);
+                    MainActivity.this.startActivity(intent);
+                    break;
+                }
+                //注销
+                case R.id.action_logout: {
+                    if(PreferenceUtil.deleteUserInfo(MainActivity.this)) {
+                        Intent intent = new Intent();
+                        intent.setClass(MainActivity.this, LoginActivity.class);
+                        MainActivity.this.startActivity(intent);
+                        MainActivity.this.finish();
+                    }
+                    break;
+                }
+
+            }
+
+            if (!msg.equals("")) {
+                Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+            }
+            return true;
+        }
+    };
 
     private void getInitData() {
 
@@ -108,12 +151,12 @@ public class MainActivity extends BaseActivity{
         Gson gson = new Gson();
         EssayArticle data = gson.fromJson(result, EssayArticle.class);
 
-        if(data.code == 0) {
+        if (data.code == 0) {
             ArrayList<ArticleItem> arr = data.data;
 
-            for(ArticleItem list:arr) {
+            for (ArticleItem list : arr) {
                 Map<String, Object> map = new HashMap<>();
-                map.put("avatar", getHttpBitmap(list.imageurl));
+                map.put("avatar", R.drawable.ava);
                 map.put("name", list.username);
                 map.put("title", list.title);
                 map.put("content", list.content);
@@ -139,12 +182,11 @@ public class MainActivity extends BaseActivity{
     //帖子列表点击跳转
     @Event(value = R.id.listView, type = AdapterView.OnItemClickListener.class)
     private void onListClick(AdapterView<?> parent, View view, int position, long id) {
-        Map<String, Object> clkmap = (Map<String, Object>)parent.getItemAtPosition(position);
+        Map<String, Object> clkmap = (Map<String, Object>) parent.getItemAtPosition(position);
         Intent intent = new Intent();
         intent.setClass(MainActivity.this, ItemDetailActivity.class);
         intent.putExtra("id", clkmap.get("id").toString());
         MainActivity.this.startActivity(intent);
-        //MainActivity.this.finish();
     }
 
     //发表帖子
@@ -153,7 +195,6 @@ public class MainActivity extends BaseActivity{
         Intent intent = new Intent();
         intent.setClass(MainActivity.this, PostArticleActivity.class);
         MainActivity.this.startActivity(intent);
-        //MainActivity.this.finish();
     }
 
     //下拉刷新
@@ -163,38 +204,5 @@ public class MainActivity extends BaseActivity{
         getInitData();
     }
 
-    private ImageView setupImage(ImageView imageView, String imgUrl) {
-        x.image().bind(imageView, imgUrl);
-        return imageView;
-    }
-
-    public static Bitmap getHttpBitmap(String url){
-        URL myFileURL;
-        Bitmap bitmap=null;
-        try{
-            myFileURL = new URL(url);
-            //获得连接
-            HttpURLConnection conn=(HttpURLConnection)myFileURL.openConnection();
-            //设置超时时间为6000毫秒，conn.setConnectionTiem(0);表示没有时间限制
-            conn.setConnectTimeout(6000);
-            //连接设置获得数据流
-            conn.setDoInput(true);
-            //不使用缓存
-            conn.setUseCaches(false);
-            //这句可有可无，没有影响
-            //conn.connect();
-            //得到数据流
-            InputStream is = conn.getInputStream();
-            //解析得到图片
-            bitmap = BitmapFactory.decodeStream(is);
-            //关闭数据流
-            is.close();
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-
-        return bitmap;
-
-    }
 
 }
