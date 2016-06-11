@@ -4,65 +4,6 @@
     android:layout_height="match_parent"
     android:background="#ffffff"
     android:orientation="vertical" >
-    <FrameLayout
-        android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-       >
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:layout_marginTop="30dip">
-            <FrameLayout
-                android:layout_width="60.0dip"
-                android:layout_height="60.0dip"
-                android:layout_marginLeft="15dip">
-
-
-            </FrameLayout>
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="15dip"
-                android:layout_marginTop="10dip"
-                android:orientation="vertical"
-                android:gravity="center_horizontal"
-                >
-                <TextView
-                    android:id="@+id/photo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#ffffff"
-                    android:layout_marginTop="5dip"
-                    android:textSize="20sp"
-                    android:text="我的昵称"/>
-
-            </LinearLayout>
-
-
-        </LinearLayout>
-        <!-- 简介 -->
-        <LinearLayout
-            android:layout_marginTop="30dip"
-            android:orientation="horizontal"
-            android:background="#22000000"
-            android:layout_width="fill_parent"
-            android:layout_height="30dip"
-            android:layout_gravity="bottom">
-            <TextView
-                android:id="@+id/intor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="10.0dip"
-                android:textColor="#ffffff"
-                android:text="个人资料"
-                />
-        </LinearLayout>
-    </FrameLayout>
-
 
 
     <LinearLayout
@@ -83,7 +24,7 @@
                 android:id="@+id/userimage"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:src="@drawable/userface" />
+                android:src="@drawable/logo2" />
 
         </FrameLayout>
 
@@ -152,7 +93,7 @@
             android:text="张鑫"
             android:textColor="#000000"
             android:textSize="20sp"
-            />
+            android:minWidth="150dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -209,7 +150,7 @@
             android:textColor="#000000"
             android:textSize="20sp"
             android:inputType="textPassword"
-            />
+            android:minWidth="150dp" />
         <TextView
             android:id="@+id/oldError"
             android:layout_width="wrap_content"
@@ -218,7 +159,7 @@
             android:textSize="20sp"
             android:textColor="@color/colorError"
             android:text="Error!"
-            android:visibility="invisible"/>
+            android:visibility="invisible" />
 
     </LinearLayout>
     <LinearLayout
@@ -249,7 +190,7 @@
             android:textSize="20sp"
             android:inputType="textPassword"
             android:maxLines="1"
-            />
+            android:minWidth="150dp" />
         <TextView
             android:id="@+id/newError"
             android:layout_width="wrap_content"

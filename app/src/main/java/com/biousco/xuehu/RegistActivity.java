@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.biousco.xuehu.Cgi.XuehuApi;
+import com.biousco.xuehu.Model.BaseModel;
 import com.biousco.xuehu.Model.LoginModel;
 import com.biousco.xuehu.Model.UserInfoModel;
 import com.biousco.xuehu.helper.PreferenceUtil;
@@ -52,8 +53,10 @@ public class RegistActivity extends BaseActivity {
     private AutoCompleteTextView mEmailView;
     @ViewInject(R.id.password)
     private EditText mPasswordView;
-    @ViewInject(R.id.email_sign_in_button)
-    private Button mEmailSignInButton;
+    @ViewInject(R.id.email_regist_button)
+    private Button registButton;
+    @ViewInject(R.id.name)
+    private EditText nameView;
     @ViewInject(R.id.login_form)
     private View mLoginFormView;
     @ViewInject(R.id.login_progress)
@@ -67,46 +70,18 @@ public class RegistActivity extends BaseActivity {
     @Event(value = R.id.password, type = TextView.OnEditorActionListener.class)
     private boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
         if (id == R.id.login || id == EditorInfo.IME_NULL) {
-            attemptLoginOrRegist("login");
+            attemptRegist();
             return true;
         }
         return false;
     }
 
-    /**
-     * 用Sp存储用户名和密码
-     **/
-    @Event(value = R.id.remember_checkbox, type = CompoundButton.OnCheckedChangeListener.class)
-    private void onRememberClick(CompoundButton buttonView, boolean isChecked) {
-        SharedPreferences sp = getSharedPreferences(SP_INFOS, MODE_PRIVATE);
-        // 获得Preferences
-        SharedPreferences.Editor editor = sp.edit(); // 获得Editor
-        if (isChecked) {
-            editor.putString(USERID, this.mEmailView.getText().toString()); // 将用户的帐号存入Preferences
-            editor.putString(PASSWORD, this.mPasswordView.getText().toString()); // 将密码存入Preferences
-        } else {
-            editor.putString(USERID, null); // 不选中，设置为空
-            editor.putString(PASSWORD, null);
-        }
-        editor.apply();
-    }
-
-
-    @Event(value = R.id.email_sign_in_button)
-    private void onSinginClick(View view) {
-        attemptLoginOrRegist("login");
-    }
 
     @Event(value = R.id.email_regist_button)
-    private void onRegistClick(View view) { attemptLoginOrRegist("regist"); }
+    private void onRegistClick(View view) { attemptRegist(); }
 
 
-    /**
-     * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
-     */
-    private void attemptLoginOrRegist(String type) {
+    private void attemptRegist() {
         // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
@@ -114,6 +89,7 @@ public class RegistActivity extends BaseActivity {
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
+        String name = nameView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -142,12 +118,7 @@ public class RegistActivity extends BaseActivity {
             focusView.requestFocus();
         } else {
             showProgress(true);
-            if(type == "login") {
-                userLogin(email, password);
-            } else if(type == "regist") {
-                userRegist(email, password);
-            }
-
+            userRegist(email, password, name);
         }
     }
 
@@ -198,57 +169,13 @@ public class RegistActivity extends BaseActivity {
         //progressDialog = ProgressDialog.show(LoginActivity.this, "登陆", "正在登陆");
     }
 
-    /** 请求后台进行登录 **/
-    private void userLogin(String email, String password) {
-
-        RequestParams requestParams = new RequestParams(XuehuApi.LOGIN_URL);
-        requestParams.addBodyParameter("userid", email);
-        requestParams.addBodyParameter("password", password);
-
-        final Context _this = this;
-        //指定回调函数的返回类型为JSON
-        x.http().post(requestParams, new Callback.CommonCallback<String>() {
-            @Override
-            public void onSuccess(String result) {
-                Gson gson = new Gson();
-                LoginModel data = gson.fromJson(result, LoginModel.class);
-                if(data.code == 0) {
-                    //登录成功
-                    UserInfoModel ui = data.data;
-                    if(PreferenceUtil.saveUserInfo(_this, ui)) {
-                        Toast.makeText(x.app(), "登录成功", Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(RegistActivity.this, CenterActivity.class);
-                        RegistActivity.this.startActivity(intent);
-                        RegistActivity.this.finish();
-                    }
-                } else {
-                    Toast.makeText(x.app(), data.msg, Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onError(Throwable ex, boolean isOnCallback) {
-                Toast.makeText(x.app(), ex.getMessage(), Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onCancelled(CancelledException cex) {
-                Toast.makeText(x.app(), "cancelled", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onFinished() {
-
-            }
-
-        });
-    }
 
     /** 请求后台进行注册 **/
-    private void userRegist(String email, String password) {
+    private void userRegist(String email, String password, String name) {
         RequestParams requestParams = new RequestParams(XuehuApi.POST_REGIST_URL);
         requestParams.addBodyParameter("userid", email);
         requestParams.addBodyParameter("password", password);
+        requestParams.addBodyParameter("username", name);
 
         final Context _this = this;
         //指定回调函数的返回类型为JSON
@@ -256,16 +183,11 @@ public class RegistActivity extends BaseActivity {
             @Override
             public void onSuccess(String result) {
                 Gson gson = new Gson();
-                LoginModel data = gson.fromJson(result, LoginModel.class);
+                BaseModel data = gson.fromJson(result, BaseModel.class);
                 if(data.code == 0) {
                     //登录成功
-                    UserInfoModel ui = data.data;
-                    if(PreferenceUtil.saveUserInfo(_this, ui)) {
-                        Toast.makeText(x.app(), "登录成功", Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(RegistActivity.this, CenterActivity.class);
-                        RegistActivity.this.startActivity(intent);
-                        RegistActivity.this.finish();
-                    }
+                    Toast.makeText(x.app(), "注册成功！", Toast.LENGTH_LONG).show();
+                    RegistActivity.this.finish();
                 } else {
                     Toast.makeText(x.app(), data.msg, Toast.LENGTH_LONG).show();
                 }

@@ -10,8 +10,7 @@ public class XuehuApi {
     public static String GETARTICLE_DETAIL_URL = apiDomain + "/GDUFS/XHBBS/Essay/getDetails";
     public static String POST_COMMENT_URL = apiDomain + "/GDUFS/XHBBS/Essay/comment";
     public static String POST_ARTICLE_URL = apiDomain + "/GDUFS/XHBBS/Essay/publish";
-    public static String POST_REGIST_URL = apiDomain + "/GDUFS/auth/Register";
-
+    public static String POST_REGIST_URL = apiDomain + "/GDUFS/auth/Register/doRegister";
 
     public static String POST_UPLOADFACE_URL=apiDomain+"/GDUFS/auth/Modify/upload";
     public static  String ImgDomain="http://115.28.188.150/GDUFS/Uploads/userface/";

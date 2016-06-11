@@ -39,15 +39,13 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".PostComment"
-            android:label="添加回复"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".PostArticleActivity" />
-
+            android:label="添加回复" />
+        <activity
+            android:name=".PostArticleActivity"
+            android:label="发表帖子"/>
         <activity
             android:name=".CenterActivity"
-            android:label="@string/title_activity_center"
-            android:parentActivityName=".BaseActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_center"/>
     </application>
 
 </manifest>

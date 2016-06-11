@@ -247,7 +247,7 @@ public class LoginActivity extends BaseActivity {
                     UserInfoModel ui = data.data;
                     if(PreferenceUtil.saveUserInfo(_this, ui)) {
                         Toast.makeText(x.app(), "登录成功", Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(LoginActivity.this, CenterActivity.class);
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         LoginActivity.this.startActivity(intent);
                         LoginActivity.this.finish();
                     }

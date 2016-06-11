@@ -214,14 +214,6 @@ public class CenterActivity extends BaseActivity {
 
     }
 
-    @Event(value =R.id.fab,type = View.OnClickListener.class)
-    private  void fabClick(View view){
-        Intent intent = new Intent(CenterActivity.this, MainActivity.class);
-        CenterActivity.this.startActivity(intent);
-        CenterActivity.this.finish();
-    }
-
-
     @Event(value = R.id.modifyBtn, type = View.OnClickListener.class)
     private void btnClick(View view) {
 

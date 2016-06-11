@@ -28,8 +28,6 @@ import java.util.Map;
 @ContentView(R.layout.activity_post_comment)
 public class PostComment extends BaseActivity {
 
-    @ViewInject(R.id.post_toolbar)
-    private Toolbar toolbar;
     @ViewInject(R.id.post_btn)
     private Button post_btn;
     @ViewInject(R.id.comment_post_editText)
@@ -42,7 +40,6 @@ public class PostComment extends BaseActivity {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
         articleID = intent.getStringExtra("articleID");
-        setSupportActionBar(toolbar);
     }
 
     @Event(value = R.id.post_btn)

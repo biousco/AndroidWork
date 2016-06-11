@@ -2,8 +2,10 @@ package com.biousco.xuehu;
 
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -42,16 +44,35 @@ public class ItemDetailActivity extends BaseActivity {
 
     @ViewInject(R.id.post_fab)
     private FloatingActionButton post_fab;
+    @ViewInject(R.id.toolbar)
+    private Toolbar toolbar;
+    @ViewInject(value = R.id.swipeView, parentId = R.layout.in_content_item)
+    private SwipeRefreshLayout swipeView;
 
     String item_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        toolbar.setTitle("帖子详情");
+        setSupportActionBar(toolbar);
+
         Intent intent = getIntent();
         item_id = intent.getStringExtra("id");
         getinitData(item_id);
 
+        swipeView.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
+    }
+
+    //下拉刷新
+    @Event(value = R.id.swipeView, type = SwipeRefreshLayout.OnRefreshListener.class)
+    private void onRefresh() {
+        swipeView.setEnabled(false);
+        getinitData(item_id);
     }
 
     @Event(value = R.id.post_fab)
@@ -92,7 +113,7 @@ public class ItemDetailActivity extends BaseActivity {
     private void dataSuccessCallback(String result) {
         Gson gson = new Gson();
         ArticleDetailModel data = gson.fromJson(result, ArticleDetailModel.class);
-        if(data.code == 0) {
+        if (data.code == 0) {
             ArticleItem article = data.data;
             ArrayList<CommentModel> comments = article.comment_details;
 
@@ -102,7 +123,7 @@ public class ItemDetailActivity extends BaseActivity {
             //评论列表
             ArrayList<Map<String, Object>> listitem = new ArrayList<Map<String, Object>>();
 
-            for(CommentModel list:comments) {
+            for (CommentModel list : comments) {
                 Map<String, Object> map = new HashMap<String, Object>();
                 map.put("avatar", R.drawable.ava);
                 map.put("name", list.username);
@@ -119,6 +140,10 @@ public class ItemDetailActivity extends BaseActivity {
                     new int[]{R.id.reply_item_avatar,
                             R.id.reply_item_user, R.id.reply_item_content});
             reply_listview.setAdapter(listItemAdapter);
+
+            swipeView.setEnabled(true);
+            swipeView.setRefreshing(false);
+            Toast.makeText(x.app(), "刷新成功", Toast.LENGTH_SHORT).show();
         }
     }
 }
