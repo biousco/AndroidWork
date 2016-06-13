@@ -1,4 +1,4 @@
-package com.biousco.xuehu;
+package com.biousco.xuehu.Model;
 
 import android.graphics.Bitmap;
 

@@ -1,32 +1,23 @@
 package com.biousco.xuehu;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.biousco.xuehu.Cgi.XuehuApi;
 import com.biousco.xuehu.Model.ArticleItem;
 import com.biousco.xuehu.Model.EssayArticle;
+import com.biousco.xuehu.Model.MainListItemData;
 import com.biousco.xuehu.helper.MainListAdapter;
 import com.biousco.xuehu.helper.PreferenceUtil;
-import com.biousco.xuehu.helper.UserInfoHelper;
 import com.google.gson.Gson;
 
 import org.xutils.common.Callback;
@@ -36,14 +27,7 @@ import org.xutils.view.annotation.Event;
 import org.xutils.view.annotation.ViewInject;
 import org.xutils.x;
 
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.RunnableFuture;
 
 @ContentView(R.layout.activity_main)
 public class MainActivity extends BaseActivity {
@@ -171,16 +155,8 @@ public class MainActivity extends BaseActivity {
 
         //自定义Adapter填充列表数据
         MainListAdapter adapter = new MainListAdapter(this,listitem);
-
-//        SimpleAdapter listItemAdapter = new SimpleAdapter(
-//                this,
-//                listitem,
-//                R.layout.list_item,
-//                new String[]{"avatar", "name", "title", "content", "id"},
-//                new int[]{R.id.item_user_avatar,
-//                        R.id.item_user, R.id.item_title, R.id.item_content_brief});
-
         listView.setAdapter(adapter);
+
         swipeLayout.setEnabled(true);
         swipeLayout.setRefreshing(false);
         Toast.makeText(x.app(), "刷新成功", Toast.LENGTH_SHORT).show();

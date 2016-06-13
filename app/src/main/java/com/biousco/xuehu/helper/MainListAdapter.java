@@ -1,7 +1,6 @@
 package com.biousco.xuehu.helper;
 
 import android.content.Context;
-import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.biousco.xuehu.MainListItemData;
+import com.biousco.xuehu.Model.MainListItemData;
 import com.biousco.xuehu.R;
 
 import org.xutils.x;

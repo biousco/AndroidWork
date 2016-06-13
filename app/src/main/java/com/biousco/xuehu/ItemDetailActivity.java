@@ -17,6 +17,7 @@ import com.biousco.xuehu.Model.ArticleDetailModel;
 import com.biousco.xuehu.Model.ArticleItem;
 import com.biousco.xuehu.Model.CommentModel;
 import com.biousco.xuehu.Model.EssayArticle;
+import com.biousco.xuehu.helper.CommentListAdapter;
 import com.google.gson.Gson;
 
 import org.xutils.common.Callback;
@@ -81,7 +82,6 @@ public class ItemDetailActivity extends BaseActivity {
         intent.setClass(ItemDetailActivity.this, PostComment.class);
         intent.putExtra("articleID", item_id);
         ItemDetailActivity.this.startActivity(intent);
-        //MainActivity.this.finish();
     }
 
     private void getinitData(String item_id) {
@@ -121,25 +121,20 @@ public class ItemDetailActivity extends BaseActivity {
             item_content.setText(article.content);
 
             //评论列表
-            ArrayList<Map<String, Object>> listitem = new ArrayList<Map<String, Object>>();
+            ArrayList<CommentModel> listitem = new ArrayList<CommentModel>();
 
             for (CommentModel list : comments) {
-                Map<String, Object> map = new HashMap<String, Object>();
-                map.put("avatar", R.drawable.ava);
-                map.put("name", list.username);
-                map.put("content", list.content);
-                map.put("id", list.id);
+                CommentModel map = new CommentModel(
+                        list.id,
+                        list.content,
+                        list.username,
+                        list.imageurl
+                );
                 listitem.add(map);
             }
 
-            SimpleAdapter listItemAdapter = new SimpleAdapter(
-                    this,
-                    listitem,
-                    R.layout.item_reply_list_item,
-                    new String[]{"avatar", "name", "content"},
-                    new int[]{R.id.reply_item_avatar,
-                            R.id.reply_item_user, R.id.reply_item_content});
-            reply_listview.setAdapter(listItemAdapter);
+            CommentListAdapter adapter = new CommentListAdapter(this, listitem);
+            reply_listview.setAdapter(adapter);
 
             swipeView.setEnabled(true);
             swipeView.setRefreshing(false);
