@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.biousco.xuehu.Cgi.XuehuApi;
 import com.biousco.xuehu.Model.ArticleItem;
 import com.biousco.xuehu.Model.EssayArticle;
+import com.biousco.xuehu.helper.MainListAdapter;
 import com.biousco.xuehu.helper.PreferenceUtil;
 import com.biousco.xuehu.helper.UserInfoHelper;
 import com.google.gson.Gson;
@@ -50,7 +51,7 @@ public class MainActivity extends BaseActivity {
     @ViewInject(R.id.toolbar)
     private Toolbar toolbar;
 
-    @ViewInject(R.id.fab)
+    @ViewInject(R.id.main_fab)
     private FloatingActionButton fab;
 
     @ViewInject(value = R.id.listView, parentId = R.layout.in_content_item)
@@ -87,6 +88,7 @@ public class MainActivity extends BaseActivity {
         return true;
     }
 
+    //顶部菜单跳转
     private Toolbar.OnMenuItemClickListener onMenuItemClick = new Toolbar.OnMenuItemClickListener() {
         @Override
         public boolean onMenuItemClick(MenuItem menuItem) {
@@ -147,7 +149,8 @@ public class MainActivity extends BaseActivity {
 
     //拿到数据的回调
     private void dataSuccessCallback(String result) {
-        final ArrayList<Map<String, Object>> listitem = new ArrayList<>();
+        ArrayList<MainListItemData> listitem = new ArrayList<MainListItemData>();
+
         Gson gson = new Gson();
         EssayArticle data = gson.fromJson(result, EssayArticle.class);
 
@@ -155,25 +158,29 @@ public class MainActivity extends BaseActivity {
             ArrayList<ArticleItem> arr = data.data;
 
             for (ArticleItem list : arr) {
-                Map<String, Object> map = new HashMap<>();
-                map.put("avatar", R.drawable.ava);
-                map.put("name", list.username);
-                map.put("title", list.title);
-                map.put("content", list.content);
-                map.put("id", list.id);
+                MainListItemData map = new MainListItemData(
+                        list.id,
+                        list.username,
+                        list.title,
+                        list.content,
+                        list.imageurl
+                );
                 listitem.add(map);
             }
         }
 
         //自定义Adapter填充列表数据
-        SimpleAdapter listItemAdapter = new SimpleAdapter(
-                this,
-                listitem,
-                R.layout.list_item,
-                new String[]{"avatar", "name", "title", "content", "id"},
-                new int[]{R.id.item_user_avatar,
-                        R.id.item_user, R.id.item_title, R.id.item_content_brief});
-        listView.setAdapter(listItemAdapter);
+        MainListAdapter adapter = new MainListAdapter(this,listitem);
+
+//        SimpleAdapter listItemAdapter = new SimpleAdapter(
+//                this,
+//                listitem,
+//                R.layout.list_item,
+//                new String[]{"avatar", "name", "title", "content", "id"},
+//                new int[]{R.id.item_user_avatar,
+//                        R.id.item_user, R.id.item_title, R.id.item_content_brief});
+
+        listView.setAdapter(adapter);
         swipeLayout.setEnabled(true);
         swipeLayout.setRefreshing(false);
         Toast.makeText(x.app(), "刷新成功", Toast.LENGTH_SHORT).show();
@@ -182,15 +189,15 @@ public class MainActivity extends BaseActivity {
     //帖子列表点击跳转
     @Event(value = R.id.listView, type = AdapterView.OnItemClickListener.class)
     private void onListClick(AdapterView<?> parent, View view, int position, long id) {
-        Map<String, Object> clkmap = (Map<String, Object>) parent.getItemAtPosition(position);
+        MainListItemData clkmap = (MainListItemData) parent.getItemAtPosition(position);
         Intent intent = new Intent();
         intent.setClass(MainActivity.this, ItemDetailActivity.class);
-        intent.putExtra("id", clkmap.get("id").toString());
+        intent.putExtra("id", clkmap.getId());
         MainActivity.this.startActivity(intent);
     }
 
     //发表帖子
-    @Event(value = R.id.fab)
+    @Event(value = R.id.main_fab)
     private void onPostClick(View view) {
         Intent intent = new Intent();
         intent.setClass(MainActivity.this, PostArticleActivity.class);
